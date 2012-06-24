@@ -59,7 +59,10 @@ public class GraphExperimental extends JApplet {
 		Set<String> results = new HashSet<String>();
 		for(int i=0; i<n; ++i){
 			int startIndex = (int)(Math.random()*dna.length());
-			results.add(dna.substring(startIndex, Math.min(startIndex+k, dna.length())));
+			String sample = (dna.substring(startIndex, Math.min(startIndex+k, dna.length())));
+			if(sample!=null && sample.length()>=k){
+				results.add(sample);
+			}
 		}
 		return results;
 	}
@@ -74,7 +77,7 @@ public class GraphExperimental extends JApplet {
 		}
 	}
 	
-	public static DirectedGraph<String, String> getTheGraph(String[] reads, int k){
+	public static DirectedGraph<String, String> getTheGraph(Set<String> reads, int k){
 		DirectedGraph<String, String> graph = new DefaultDirectedGraph<String, String>(new DeBruijnEdgeFactory());
 		for(String read : reads){
 			if(k>read.length()){
@@ -103,8 +106,14 @@ public class GraphExperimental extends JApplet {
 	}
 	
 	public void init(){
-		String[] reads = {"VALENTINA", "SHAPIRO"};
-		DirectedGraph<String, String> graph = getTheGraph(reads, 5);
+		//String[] reads = {"ACGTAC","TACCGT","ACCGTA","TAGGTA","CGTAGG"};
+		int k=6;
+		int n=50;
+		Set<String> reads = shotgun("ACGTACCGTAGGTA", 9, n);
+		for(String read : reads){
+			System.out.println("READ: "+read);
+		}
+		DirectedGraph<String, String> graph = getTheGraph(reads, k);
 		JGraphModelAdapter<String, String> jGraphAdapter = new JGraphModelAdapter<String, String>(graph);
 	
 		JGraph jGraph = new JGraph(jGraphAdapter);
