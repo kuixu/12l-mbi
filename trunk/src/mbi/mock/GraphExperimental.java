@@ -24,7 +24,7 @@ import sun.security.provider.certpath.Vertex;
 public class GraphExperimental extends JApplet {
 	
     private static final Color     DEFAULT_BG_COLOR = Color.decode( "#FAFBFF" );
-    private static final Dimension DEFAULT_SIZE = new Dimension( 1200, 950 );
+    private static final Dimension DEFAULT_SIZE = new Dimension( 1200, 900 );
 	
 	/**
 	 * 
@@ -83,7 +83,7 @@ public class GraphExperimental extends JApplet {
 				//String prevKmer=null;
 				//String prevNode=null;
 				for(int s=0,e=k; e<=read.length(); ++s, ++e){
-					System.out.println(read.substring(s, e));
+					//System.out.println(read.substring(s, e));
 					String lo = read.substring(s, e-1);
 					String ld = read.substring(s+1, e);
 					if(!graph.containsVertex(lo)){
@@ -94,6 +94,7 @@ public class GraphExperimental extends JApplet {
 					}
 					if(!graph.containsEdge(lo, ld)){
 						graph.addEdge(lo, ld);
+						System.out.println("adding edge: "+lo+"-"+ld);
 					}
 				}
 			}
@@ -102,8 +103,8 @@ public class GraphExperimental extends JApplet {
 	}
 	
 	public void init(){
-		String[] reads = {"VERKEHRSBEHINDERUNGEN"};
-		DirectedGraph<String, String> graph = getTheGraph(reads, 3);
+		String[] reads = {"VALENTINA", "SHAPIRO"};
+		DirectedGraph<String, String> graph = getTheGraph(reads, 5);
 		JGraphModelAdapter<String, String> jGraphAdapter = new JGraphModelAdapter<String, String>(graph);
 	
 		JGraph jGraph = new JGraph(jGraphAdapter);
@@ -152,7 +153,7 @@ public class GraphExperimental extends JApplet {
     	int vertices = g.vertexSet().size();
     	double step = 2*Math.PI/vertices;
     	double counter=0;
-    	double stdSpan=Math.sqrt(Math.pow(DEFAULT_SIZE.width, 2)+Math.pow(DEFAULT_SIZE.height, 2))/(0.2*vertices);
+    	double stdSpan=400;
     	for(String vertex : g.vertexSet()){
     		positionVertexAt(vertex, DEFAULT_SIZE.width/2+(int)(stdSpan*Math.cos(counter)), 
     				DEFAULT_SIZE.height/2+(int)(stdSpan*Math.sin(counter)), ga);
