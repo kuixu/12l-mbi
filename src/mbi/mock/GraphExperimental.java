@@ -30,10 +30,10 @@ public class GraphExperimental extends JApplet {
 		String sequence = "EKRANASAKRANOS";
 		String[] reads = {"EKRANA","NASAKR","KRANOS","KRANAN"};
 		Set<String> readSet = new HashSet<String>();
-		int k = 3;
-		//String sequence = generateSequence(20);
-		// String sequence = "GACAAAAGTCCTAGTAATCG";
-		//readSet = safeShotgun(sequence, 10);
+		int k = 4;
+//		String sequence = generateSequence(40);
+//		String sequence = "GACAAAAGTCCTAGTAATCG";
+//		readSet = safeShotgun(sequence, 25);
 
 		System.out.println("SHOTGUN product: " + readSet.toString());
 
@@ -159,7 +159,8 @@ public class GraphExperimental extends JApplet {
 						// System.out.println("adding edge: "+lo+"-"+ld);
 					} else {
 						if (!repeats.containsKey(graph.getEdge(lo, ld))) {
-							graph.addEdge(lo, ld);
+							// if()
+							//graph.addEdge(lo, ld);
 							repeats.put(graph.getEdge(lo, ld), 0);
 						}
 						repeats.put(graph.getEdge(lo, ld),
@@ -174,6 +175,9 @@ public class GraphExperimental extends JApplet {
 
 	// SOME STUFF FOR JGRAPH ADAPTER
 
+	
+	
+	
 	private void adjustDisplaySettings(JGraph jg) {
 		jg.setPreferredSize(DEFAULT_SIZE);
 

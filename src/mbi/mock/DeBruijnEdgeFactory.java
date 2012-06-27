@@ -28,7 +28,7 @@ public class DeBruijnEdgeFactory implements EdgeFactory<String, String> {
 				}
 				suffix = "(" + nextNo + ")";
 			}
-			return v1 + v2.substring(v2.length() - 1, v2.length()) + suffix;
+			return v1.substring(0,1) + v2.substring(1, v2.length()) + suffix;
 		} else {
 			return null;
 		}
