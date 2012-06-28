@@ -14,8 +14,8 @@ public class Main {
 		System.out.println(kmers.toString());
 
 		DeBruijnGraph graph = AssemblerDNA.getDeBruijnGraph(kmers, true);
-		GraphDisplay gDisplay = new GraphDisplay(graph);
-		gDisplay.init();
+		//GraphDisplay gDisplay = new GraphDisplay(graph);
+		//gDisplay.init();
 
 		String result = graph.assemble();
 		System.out.println("GENERATED "

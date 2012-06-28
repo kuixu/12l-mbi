@@ -93,7 +93,7 @@ public class DeBruijnGraph extends DirectedMultigraph<String, String> {
 			current = determineCrossing(paths.get(paths.size() - 1), inDegrees);
 		}
 
-		System.out.println(paths.toString());
+		System.out.println("PATHS: "+paths.toString());
 		return getGenome(paths);
 	}
 
@@ -153,13 +153,10 @@ public class DeBruijnGraph extends DirectedMultigraph<String, String> {
 			}
 		}
 		StringBuilder str = new StringBuilder();
-		for (String read : result) {
-			if (!read.equals(result.get(result.size() - 1))) {
-				str.append(read.substring(0, 1));
-			} else {
-				str.append(read);
-			}
+		for(int i=0; i<result.size()-1; ++i){
+			str.append(result.get(i).substring(0,1));
 		}
+		str.append(result.get(result.size()-1));
 		return str.toString();
 	}
 

@@ -21,13 +21,37 @@ public class GraphDisplay extends JApplet {
 	private static final Color DEFAULT_BG_COLOR = Color.decode("#FAFBFF");
 	private static final Dimension DEFAULT_SIZE = new Dimension(1200, 900);
 
-	private Graph graph;
+	private DeBruijnGraph graph;
 	
-	public GraphDisplay(Graph graph){
-		this.graph=graph;
-	}
+//	public GraphDisplay(DeBruijnGraph graph){
+//		super();
+//		this.graph=graph;
+//	}
 	
 	public void init() {
+		String sequence = "SARKAFARKA";
+		List<String> kmers = AssemblerDNA.perfectShotgun(sequence, 4);
+
+		System.out.println(kmers.toString());
+
+		graph = AssemblerDNA.getDeBruijnGraph(kmers, true);
+
+		String result = graph.assemble();
+		System.out.println("GENERATED "
+				+ (sequence.equals(result) ? "eqals" : "differs from")
+				+ " RESULT");
+		System.out.println(sequence);
+		System.out.println(result);
+		if (result != null) {
+			System.out.println("GENERATED "
+					+ (sequence.indexOf(result, 0) > -1 ? "contains"
+							: "doesn't contain") + " RESULT");
+			System.out.println("RESULT "
+					+ (result.indexOf(sequence, 0) > -1 ? "contains"
+							: "doesn't contain") + " GENERATED");
+		}
+
+		
 		JGraphModelAdapter<String, String> jGraphAdapter = new JGraphModelAdapter<String, String>(
 				graph);
 		JGraph jGraph = new JGraph(jGraphAdapter);
