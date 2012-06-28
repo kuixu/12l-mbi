@@ -45,7 +45,7 @@ public class Main {
 		String sequence = "ABRAKADABRA";
 		int patience = 10;
 		int trials = 20;
-		int k = 3;
+		int k = 5;
 
 		for (int i = 0; i < args.length - 1; ++i) {
 			if (args[i].equals("-f")) {
@@ -74,7 +74,7 @@ public class Main {
 
 		List<String> kmers = AssemblerDNA.perfectShotgun(sequence, k);
 		DeBruijnGraph graph = AssemblerDNA.getDeBruijnGraph(kmers, true);
-		graph = AssemblerDNA.simplify(graph);
+		//graph = AssemblerDNA.simplify(graph);
 		
 		JApplet grApphlet = new GrApphlet();
 		((GrApphlet)grApphlet).setGraph(graph);
@@ -88,7 +88,7 @@ public class Main {
 		 mainFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		
 		System.out.println("K-MERS: "+kmers.toString());
-		String result = AssemblerDNA.attemptAssembly(kmers, trials, patience);
+		String result = AssemblerDNA.attemptAssembly(kmers, trials, patience, true);
 		System.out.println("GENERATED "
 				+ (sequence.equals(result) ? "eqals" : "differs from")
 				+ " RESULT");
@@ -112,7 +112,7 @@ public class Main {
 				for (int test = 0; test < 100; ++test) {
 					String sequence = AssemblerDNA.generateSequence(length);
 					String result = AssemblerDNA.attemptAssembly(
-							AssemblerDNA.perfectShotgun(sequence, k), tri, pat);
+							AssemblerDNA.perfectShotgun(sequence, k), tri, pat, false);
 					if (sequence.equals(result)) {
 						++successes;
 					}

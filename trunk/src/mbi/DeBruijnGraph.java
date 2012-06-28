@@ -33,10 +33,12 @@ public class DeBruijnGraph extends DirectedMultigraph<String, String> {
 		return vers;
 	}
 
-	public String assemble(int patience) {
+	public String assemble(int patience, boolean verbose) {
 		Set<String> imbalancedVertices = getImbalancedVertices();
 		if (imbalancedVertices.size() != 2) {
-			System.err.println("Imbalanced graph. Aborting");
+			if(verbose){
+				System.err.println("Imbalanced graph. Aborting");
+			}
 			return null;
 		}
 		String start = null, end = null;
