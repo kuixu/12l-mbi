@@ -1,11 +1,14 @@
-package mbi.mock;
+package mbi;
 
+import java.awt.Color;
+import java.awt.Dimension;
 import java.util.Set;
 
 import org.jgrapht.EdgeFactory;
 import org.jgrapht.graph.DirectedMultigraph;
 
 public class DeBruijnEdgeFactory implements EdgeFactory<String, String> {
+
 
 	private DirectedMultigraph<String, String> graph;
 	
