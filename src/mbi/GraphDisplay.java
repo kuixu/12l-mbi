@@ -4,7 +4,9 @@ import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Rectangle;
 import java.awt.geom.Rectangle2D;
+import java.util.Collections;
 import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
@@ -23,35 +25,18 @@ public class GraphDisplay extends JApplet {
 
 	private DeBruijnGraph graph;
 	
-//	public GraphDisplay(DeBruijnGraph graph){
-//		super();
-//		this.graph=graph;
-//	}
-	
 	public void init() {
-		String sequence = "SARKAFARKA";
-		List<String> kmers = AssemblerDNA.perfectShotgun(sequence, 4);
+		//String sequence = "CAGTCCCTAAACTTGTATTC";
+		String sequence=AssemblerDNA.generateSequence(333);
+		System.out.println("SEQUENCE: "+sequence);
+		List<String> kmers = AssemblerDNA.perfectShotgun(sequence, 9);
 
-		System.out.println(kmers.toString());
+		System.out.println("KMERS: "+kmers.toString());
+		
+		
+		System.out.println("graph built...");
 
 		graph = AssemblerDNA.getDeBruijnGraph(kmers, true);
-
-		String result = graph.assemble();
-		System.out.println("GENERATED "
-				+ (sequence.equals(result) ? "eqals" : "differs from")
-				+ " RESULT");
-		System.out.println(sequence);
-		System.out.println(result);
-		if (result != null) {
-			System.out.println("GENERATED "
-					+ (sequence.indexOf(result, 0) > -1 ? "contains"
-							: "doesn't contain") + " RESULT");
-			System.out.println("RESULT "
-					+ (result.indexOf(sequence, 0) > -1 ? "contains"
-							: "doesn't contain") + " GENERATED");
-		}
-
-		
 		JGraphModelAdapter<String, String> jGraphAdapter = new JGraphModelAdapter<String, String>(
 				graph);
 		JGraph jGraph = new JGraph(jGraphAdapter);
@@ -61,6 +46,28 @@ public class GraphDisplay extends JApplet {
 		resize(DEFAULT_SIZE);
 
 		distributeVertices(jGraphAdapter, graph);
+		int tries = 100;
+		String result = null;
+		while (result == null && tries > 0) {
+			Collections.shuffle(kmers);
+			graph = AssemblerDNA.getDeBruijnGraph(kmers, true);
+			result = graph.assemble();
+			--tries;
+		}
+		System.out.println("GENERATED "
+				+ (sequence.equals(result) ? "eqals" : "differs from")
+				+ " RESULT");
+		System.out.println(sequence);
+		System.out.println(result);
+		if (result != null) {
+			System.out.println("GENERATED "
+					+ (sequence.indexOf(result, 0) > -1 ? "contains"
+							: "doesn't contain") + " RESULT");
+	System.out.println("RESULT "
+					+ (result.indexOf(sequence, 0) > -1 ? "contains"
+							: "doesn't contain") + " GENERATED");
+		}
+		
 	}
 
 	private void adjustDisplaySettings(JGraph jg) {

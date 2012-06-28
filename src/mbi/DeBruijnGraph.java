@@ -79,22 +79,31 @@ public class DeBruijnGraph extends DirectedMultigraph<String, String> {
 		List<List<String>> paths = new LinkedList<List<String>>();
 		String current = start;
 
-		inDegrees.put(start, inDegrees.get(start) - 1);
-		if (inDegrees.get(start) <= 0) {
+		//inDegrees.put(start, inDegrees.get(start) - 1);
+		if (inDegrees.get(start) == 0) {
 			inDegrees.remove(start);
 		}
 
-		while (!inDegrees.isEmpty()) {
+		int patience=10;
+		int inDegreesOldSize = inDegrees.size();
+		
+		while (!inDegrees.isEmpty() && patience >0) {
 			paths.add(new LinkedList<String>());
 			while (current != null) {
 				paths.get(paths.size() - 1).add(current);
 				current = getNextStep(this, inDegrees, current);
 			}
 			current = determineCrossing(paths.get(paths.size() - 1), inDegrees);
+			patience-=(inDegreesOldSize==inDegrees.size()?1:0);
+			inDegreesOldSize=inDegrees.size();
 		}
 
 		System.out.println("PATHS: "+paths.toString());
-		return getGenome(paths);
+		if(patience>0){
+			return getGenome(paths);
+		}else{
+			return null;
+		}
 	}
 
 	private String determineCrossing(List<String> lastPath,
@@ -118,6 +127,7 @@ public class DeBruijnGraph extends DirectedMultigraph<String, String> {
 				} else {
 					inDegrees.put(target, inDegrees.get(target) - 1);
 				}
+				g.removeEdge(edge);
 				return target;
 			}
 		}
