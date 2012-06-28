@@ -1,7 +1,5 @@
 package mbi;
 
-import java.awt.Color;
-import java.awt.Dimension;
 import java.util.Set;
 
 import org.jgrapht.EdgeFactory;
@@ -33,10 +31,8 @@ public class DeBruijnEdgeFactory implements EdgeFactory<String, String> {
 				suffix="("+nextNo+")";
 			}
 			if(v1.length()>v2.length()){
-                             System.out.println("ED1 "+v1+v2.substring(v2.length()-1, v2.length())+suffix);
 				return v1+v2.substring(v2.length()-1, v2.length())+suffix;
 			}else{
-                                System.out.println("ED2 "+v1.substring(0,1)+v2+suffix);
 				return v1.substring(0,1)+v2+suffix;
 			}
 		}else{
