@@ -18,7 +18,8 @@ public class DeBruijnEdgeFactory implements EdgeFactory<String, String> {
 	
 	@Override
 	public String createEdge(String v1, String v2) {
-		if(v1.substring(1).equals(v2.substring(0, v2.length()-1))){
+		
+		if(v1.substring(1).equals(v2.substring(0, v2.length()-1)) || v1.length() != v2.length()){
 			String suffix="";
 			if(graph.containsEdge(v1, v2)){
 				Set<String> fromV1 = graph.outgoingEdgesOf(v1);
@@ -32,8 +33,10 @@ public class DeBruijnEdgeFactory implements EdgeFactory<String, String> {
 				suffix="("+nextNo+")";
 			}
 			if(v1.length()>v2.length()){
+                             System.out.println("ED1 "+v1+v2.substring(v2.length()-1, v2.length())+suffix);
 				return v1+v2.substring(v2.length()-1, v2.length())+suffix;
 			}else{
+                                System.out.println("ED2 "+v1.substring(0,1)+v2+suffix);
 				return v1.substring(0,1)+v2+suffix;
 			}
 		}else{

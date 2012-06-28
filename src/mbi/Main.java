@@ -15,10 +15,12 @@ public class Main {
 		System.out.println(kmers.toString());
 
 		DeBruijnGraph graph = AssemblerDNA.getDeBruijnGraph(kmers, true);
+		graph = AssemblerDNA.simplify(graph);
 		//GraphDisplay gDisplay = new GraphDisplay(graph);
 		//gDisplay.init();
 
 		String result = graph.assemble();
+		
 		System.out.println("GENERATED "
 				+ (sequence.equals(result) ? "eqals" : "differs from")
 				+ " RESULT");
