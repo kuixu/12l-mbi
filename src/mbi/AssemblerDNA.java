@@ -134,5 +134,110 @@ public class AssemblerDNA {
 		}
 		return graph;
 	}
-	
+	        // bartek add
+        
+        /**
+         * replace source vertex in chain with new vertex
+         * @param graph
+         * @param vertOld
+         * @param vertNew
+         * @return 
+         */
+    private static DeBruijnGraph replaceSourceVertex (DeBruijnGraph graph, String vertOld, String vertNew) {
+            Set<String> inEdgV1  = graph.incomingEdgesOf(vertOld);
+            graph.addVertex(vertNew);
+            String vertArr [] = new String[inEdgV1.size()];
+            int i = 0;
+            for (String e : inEdgV1) {
+                vertArr[i++] = graph.getEdgeSource(e);
+            }
+            
+            // copy all edges to new vertex
+           for (String v : vertArr) {
+                graph.addEdge(v, vertNew);
+            }
+            graph.removeVertex(vertOld);
+            return graph;
+        }
+    
+        /**
+         * replace target vertex in chain with new vertex
+         * @param graph
+         * @param vertOld
+         * @param vertNew
+         * @return 
+         */
+    private static DeBruijnGraph replaceTargetVertex (DeBruijnGraph graph, String vertOld, String vertNew) {
+            Set<String> outEdgV1  = graph.outgoingEdgesOf(vertOld);
+            String vertArr [] = new String[outEdgV1.size()];
+            int i = 0;
+            for (String e : outEdgV1) {
+                vertArr[i++] = graph.getEdgeTarget(e);
+            }
+            
+             // copy all edges to new vertex
+            for (String v : vertArr) {
+                graph.addEdge(vertNew, v);
+            }
+            graph.removeVertex(vertOld);
+            return graph;
+         }
+    /**
+     * contact two vertexes to one
+     * @param v1
+     * @param v2
+     * @return 
+     */
+    private static String contactVertexes ( String v1, String v2) {
+        String newVert = "";
+        if (v1.length() > v2.length()) {
+           newVert = v1.concat(v2.substring(v2.length()-1));
+        }
+        else {
+            newVert = v1.substring(0,1).concat(v2.substring(0, v2.length()));
+        }
+        return newVert;
+    }
+    /**
+     * Function transforms "chains" of vertexes to one longer vertex. Chains consitst vertexex with only one outgoingn and one ingoing edges.
+     * @param graph
+     * @return simplified graph
+     */
+    public static DeBruijnGraph  simplify(DeBruijnGraph graph) {
+//System.out.println(graph.vertexSet().toString());
+//System.out.println(graph.edgeSet().toString());
+        boolean wasNewVert = true;
+        while(wasNewVert){
+            wasNewVert = false;
+            Set<String> tmpVert =  graph.vertexSet();
+            String certArr [] = new String[tmpVert.size()];
+            int i = 0;
+            for (String tV : tmpVert) {
+                certArr[i++] = tV;
+            }
+            
+            for (String v1 : certArr) {
+                // check if vertex is still in graph
+                if(graph.containsVertex(v1)) {
+                    Set edgs = graph.outgoingEdgesOf(v1);
+                    if (edgs.size() == 1) { // check if vertex has only one outgoing edge
+                        String e = (String) edgs.iterator().next();
+                        String v2 = graph.getEdgeTarget(e);
+                        Set edgs2 = graph.incomingEdgesOf(v2);
+
+                        if (edgs2.size() == 1) { // check if vertes on the end of that edge, has only one ingoing vertex
+                            
+                            String newVert = contactVertexes(v1, v2); // create longer vertex from two vertexes
+                            graph = replaceSourceVertex(graph, v1, newVert);
+                            graph = replaceTargetVertex(graph, v2, newVert);
+                            wasNewVert = true;
+                        }
+                    }
+                }
+            }
+        }
+//System.out.println(graph.vertexSet().toString());
+//System.out.println(graph.edgeSet().toString());
+        return graph;
+    }
 }
