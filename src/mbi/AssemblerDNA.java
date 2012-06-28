@@ -7,6 +7,7 @@ import java.io.InputStreamReader;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
@@ -141,12 +142,13 @@ public class AssemblerDNA {
 	}
 
 	public static String attemptAssembly(List<String> kmers, int attempts,
-			int attemptPatience) {
+			int attemptPatience, boolean verbose) {
 		String result = null;
 		while (attempts-- > 0 && result == null) {
 			Collections.shuffle(kmers);
 			DeBruijnGraph graph = getDeBruijnGraph(kmers, true);
-			result = graph.assemble(attemptPatience);
+			//graph=simplify(graph);
+			result = graph.assemble(attemptPatience, verbose);
 		}
 		return result;
 	}
@@ -169,7 +171,7 @@ public class AssemblerDNA {
 		return subStr.trim();
 
 	}
-	
+
 	/**
 	 * replace source vertex in chain with new vertex
 	 * 
@@ -286,6 +288,14 @@ public class AssemblerDNA {
 				}
 			}
 		}
+
+//		Set<String> verts = graph.vertexSet();
+//		for (String vert : verts.toArray(new String[verts.size()])) {
+//			if (graph.outDegreeOf(vert) == 0 && graph.inDegreeOf(vert) == 0
+//					&& graph.edgeSet().size() > 0) {
+//				graph.removeVertex(vert);
+//			}
+//		}
 		// System.out.println(graph.vertexSet().toString());
 		// System.out.println(graph.edgeSet().toString());
 		return graph;
