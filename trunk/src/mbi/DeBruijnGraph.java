@@ -18,46 +18,25 @@ public class DeBruijnGraph extends DirectedMultigraph<String, String> {
 		arg0.setGraph(this);
 	}
 
-	public boolean isBalanced() {
-		return false;
-	}
-
 	// TODO: figure out a way to do it.
 	public void balance() {
 
 	}
 	
 	public Set<String> getImbalancedVertices() {
-		Map<String, Integer> stats = new HashMap<String, Integer>();
-
-		for (String v : this.vertexSet()) {
-			stats.put(v, 0);
-		}
-
-		for (String edge : this.edgeSet()) {
-			stats.put(this.getEdgeSource(edge),
-					stats.get(this.getEdgeSource(edge)) + 1);
-			stats.put(this.getEdgeTarget(edge),
-					stats.get(this.getEdgeTarget(edge)) - 1);
-		}
-
-		Set<String> uv = new HashSet<String>();
-		for (String key : stats.keySet()) {
-			if (stats.get(key) != 0) {
-				uv.add(key);
+		Set<String> vers = new HashSet<String>();
+		for(String vert : this.vertexSet()){
+			if(this.inDegreeOf(vert)!=this.outDegreeOf(vert)){
+				vers.add(vert);
 			}
 		}
-		return uv;
+		return vers;
 	}
 
-	public String assemble() {
-		Set<String> unbalancedVertices = getImbalancedVertices();
-		for (String uv : unbalancedVertices) {
-			System.out.println("UNBALANCED VERTEX: " + uv + " balance: "
-					+ (this.outDegreeOf(uv) - this.inDegreeOf(uv)));
-		}
-		if (unbalancedVertices.size() != 0 && unbalancedVertices.size() != 2) {
-			System.out.println("Unbalanced graph given. Aborting...");
+	public String assemble(int patience) {
+		Set<String> imbalancedVertices = getImbalancedVertices();
+		if (imbalancedVertices.size() != 2) {
+			System.err.println("Imbalanced graph. Aborting");
 			return null;
 		}
 		String start = null, end = null;
@@ -68,23 +47,24 @@ public class DeBruijnGraph extends DirectedMultigraph<String, String> {
 		}
 
 		// determine the start and end of graph traversal
-		for (String v : unbalancedVertices) {
+		for (String v : imbalancedVertices) {
 			if (this.inDegreeOf(v) > this.outDegreeOf(v)) {
 				end = v;
 			} else {
 				start = v;
 			}
 		}
+		if(start==null || end==null){
+			return null;
+		}
 
 		List<List<String>> paths = new LinkedList<List<String>>();
 		String current = start;
 
-		//inDegrees.put(start, inDegrees.get(start) - 1);
 		if (inDegrees.get(start) == 0) {
 			inDegrees.remove(start);
 		}
 
-		int patience=10;
 		int inDegreesOldSize = inDegrees.size();
 		
 		while (!inDegrees.isEmpty() && patience >0) {
@@ -98,7 +78,7 @@ public class DeBruijnGraph extends DirectedMultigraph<String, String> {
 			inDegreesOldSize=inDegrees.size();
 		}
 
-		System.out.println("PATHS: "+paths.toString());
+		//System.out.println("PATHS: "+paths.toString());
 		if(patience>0){
 			return getGenome(paths);
 		}else{

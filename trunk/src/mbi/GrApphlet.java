@@ -18,55 +18,31 @@ import org.jgraph.graph.GraphConstants;
 import org.jgrapht.Graph;
 import org.jgrapht.ext.JGraphModelAdapter;
 
-public class GraphDisplay extends JApplet {
+public class GrApphlet extends JApplet {
 
 	private static final Color DEFAULT_BG_COLOR = Color.decode("#FAFBFF");
 	private static final Dimension DEFAULT_SIZE = new Dimension(1200, 900);
 
 	private DeBruijnGraph graph;
 	
+	
+	public DeBruijnGraph getGraph() {
+		return graph;
+	}
+
+	public void setGraph(DeBruijnGraph graph) {
+		this.graph = graph;
+	}
+
 	public void init() {
-		//String sequence = "CAGTCCCTAAACTTGTATTC";
-		String sequence=AssemblerDNA.generateSequence(333);
-		System.out.println("SEQUENCE: "+sequence);
-		List<String> kmers = AssemblerDNA.perfectShotgun(sequence, 9);
-
-		System.out.println("KMERS: "+kmers.toString());
-		
-		
-		System.out.println("graph built...");
-
-		graph = AssemblerDNA.getDeBruijnGraph(kmers, true);
+	
 		JGraphModelAdapter<String, String> jGraphAdapter = new JGraphModelAdapter<String, String>(
 				graph);
 		JGraph jGraph = new JGraph(jGraphAdapter);
-
 		adjustDisplaySettings(jGraph);
 		getContentPane().add(jGraph);
-		resize(DEFAULT_SIZE);
-
+		setSize(DEFAULT_SIZE);
 		distributeVertices(jGraphAdapter, graph);
-		int tries = 100;
-		String result = null;
-		while (result == null && tries > 0) {
-			Collections.shuffle(kmers);
-			graph = AssemblerDNA.getDeBruijnGraph(kmers, true);
-			result = graph.assemble();
-			--tries;
-		}
-		System.out.println("GENERATED "
-				+ (sequence.equals(result) ? "eqals" : "differs from")
-				+ " RESULT");
-		System.out.println(sequence);
-		System.out.println(result);
-		if (result != null) {
-			System.out.println("GENERATED "
-					+ (sequence.indexOf(result, 0) > -1 ? "contains"
-							: "doesn't contain") + " RESULT");
-	System.out.println("RESULT "
-					+ (result.indexOf(sequence, 0) > -1 ? "contains"
-							: "doesn't contain") + " GENERATED");
-		}
 		
 	}
 
