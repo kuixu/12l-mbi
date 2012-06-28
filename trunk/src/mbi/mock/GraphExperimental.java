@@ -6,12 +6,15 @@ import java.awt.Rectangle;
 import java.awt.geom.Rectangle2D;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
 import javax.swing.JApplet;
+
+import mbi.DeBruijnEdgeFactory;
 
 import org.jgraph.JGraph;
 import org.jgraph.graph.DefaultGraphCell;
@@ -27,19 +30,19 @@ public class GraphExperimental extends JApplet {
 	private static final Dimension DEFAULT_SIZE = new Dimension(1200, 900);
 
 	public void init() {
-		String sequence = "EKRANASAKRANOS";
-		String[] reads = {"EKRANA","NASAKR","KRANOS","KRANAN"};
+		String sequence = "ABRAKADABRA";
+		//String[] reads = {"EKRANA","NASAKR","KRANOS","KRANAN"};
 		Set<String> readSet = new HashSet<String>();
-		int k = 4;
+		int k = 3;
 //		String sequence = generateSequence(40);
 //		String sequence = "GACAAAAGTCCTAGTAATCG";
-//		readSet = safeShotgun(sequence, 25);
+		readSet = safeShotgun(sequence, 5);
 
 		System.out.println("SHOTGUN product: " + readSet.toString());
 
-		 for(String read : reads){
-			 readSet.add(read);
-		 }
+//		 for(String read : reads){
+//			 readSet.add(read);
+//		 }
 		DirectedGraph<String, String> graph = getTheGraph(readSet, k);
 		String result = assemble(graph);
 		System.out.println("No of READS: " + readSet.size());
@@ -60,11 +63,11 @@ public class GraphExperimental extends JApplet {
 				graph);
 		JGraph jGraph = new JGraph(jGraphAdapter);
 
-		adjustDisplaySettings(jGraph);
+		//adjustDisplaySettings(jGraph);
 		getContentPane().add(jGraph);
 		resize(DEFAULT_SIZE);
 
-		distributeVertices(jGraphAdapter, graph);
+		//distributeVertices(jGraphAdapter, graph);
 	}
 
 	/**
@@ -140,6 +143,8 @@ public class GraphExperimental extends JApplet {
 		DirectedMultigraph<String, String> graph = new DirectedMultigraph<String, String>(new DeBruijnEdgeFactory());
 		((DeBruijnEdgeFactory)graph.getEdgeFactory()).setGraph(graph);
 		Map<String, Integer> repeats = new HashMap<String, Integer>();
+		List<String> reps = new LinkedList<String>();
+		List<String> cntx = new LinkedList<String>();
 		for (String read : reads) {
 			if (k > read.length()) {
 				continue;
@@ -162,6 +167,8 @@ public class GraphExperimental extends JApplet {
 							// if()
 							//graph.addEdge(lo, ld);
 							repeats.put(graph.getEdge(lo, ld), 0);
+							reps.add(graph.getEdge(lo, ld));
+							cntx.add(read);
 						}
 						repeats.put(graph.getEdge(lo, ld),
 								repeats.get(graph.getEdge(lo, ld)) + 1);
@@ -170,6 +177,39 @@ public class GraphExperimental extends JApplet {
 			}
 		}
 		System.out.println("REPEATS: " + repeats);
+		
+		
+		//for(int i=0; i<cntx.size(); ++i){
+		//	graph.containsEdge(arg0)
+		//}
+		
+		//Set<String> imbalancedVerts = getUnbalancedVertices(graph);
+		//while(imbalancedVerts.size()!=2){
+		//	
+		//}
+		
+//		boolean keepTrying = false;
+//		while(keepTrying){
+//			//Set<String> imbalancedVerts = getUnbalancedVertices(graph);
+//			keepTrying=false;
+//			for(String edge : repeats.keySet()){
+//				String sv = edge.substring(0, edge.length()-1);
+//				String ev = edge.substring(1, edge.length());
+//				if(graph.outDegreeOf(sv)<graph.inDegreeOf(sv)
+//						|| graph.inDegreeOf(ev)<graph.outDegreeOf(ev)){
+//					graph.addEdge(sv, ev);
+//					if(repeats.get(edge)==1){
+//						repeats.remove(edge);
+//					}else{
+//						repeats.put(edge, repeats.get(edge)-1);
+//					}
+//					keepTrying=true;
+//					System.out.println("Inserted: "+edge);
+//					break;
+//				}
+//			}
+//		}
+		
 		return graph;
 	}
 
@@ -178,51 +218,7 @@ public class GraphExperimental extends JApplet {
 	
 	
 	
-	private void adjustDisplaySettings(JGraph jg) {
-		jg.setPreferredSize(DEFAULT_SIZE);
 
-		Color c = DEFAULT_BG_COLOR;
-		String colorStr = null;
-
-		try {
-			colorStr = getParameter("bgcolor");
-		} catch (Exception e) {
-		}
-
-		if (colorStr != null) {
-			c = Color.decode(colorStr);
-		}
-
-		jg.setBackground(c);
-	}
-
-	private void positionVertexAt(Object vertex, int x, int y,
-			JGraphModelAdapter<String, String> m_jgAdapter) {
-		DefaultGraphCell cell = m_jgAdapter.getVertexCell(vertex);
-		Map attr = cell.getAttributes();
-		Rectangle2D b = GraphConstants.getBounds(attr);
-
-		GraphConstants.setBounds(attr, new Rectangle(x, y, (int) b.getWidth(),
-				(int) b.getHeight()));
-
-		Map cellAttr = new HashMap();
-		cellAttr.put(cell, attr);
-		m_jgAdapter.edit(cellAttr, null, null, null);
-	}
-
-	private void distributeVertices(JGraphModelAdapter<String, String> ga,
-			Graph<String, String> g) {
-		int vertices = g.vertexSet().size();
-		double step = 2 * Math.PI / vertices;
-		double counter = 0;
-		double stdSpan = 400;
-		for (String vertex : g.vertexSet()) {
-			positionVertexAt(vertex, DEFAULT_SIZE.width / 2
-					+ (int) (stdSpan * Math.cos(counter)), DEFAULT_SIZE.height
-					/ 2 + (int) (stdSpan * Math.sin(counter)), ga);
-			counter += step;
-		}
-	}
 
 	/**
 	 * Returns a set of vertices violating the balance of graph
@@ -230,7 +226,7 @@ public class GraphExperimental extends JApplet {
 	 * @param graph
 	 * @return
 	 */
-	private Set<String> getUnbalancedVertices(Graph<String, String> graph) {
+	public static Set<String> getUnbalancedVertices(Graph<String, String> graph) {
 		Map<String, Integer> stats = new HashMap<String, Integer>();
 
 		for (String v : graph.vertexSet()) {
@@ -368,4 +364,78 @@ public class GraphExperimental extends JApplet {
 	// private void balanceGraph(Graph<String, String> graph){
 	// for()
 	// }
+	
+	
+	private DirectedGraph<String, String> replaceSourceVertex (DirectedGraph<String, String> graph, String vertOld, String vertNew) {
+		Set inEdgV1  = graph.incomingEdgesOf(vertOld);
+		graph.addVertex(vertNew);
+		for (Iterator it = inEdgV1.iterator(); it.hasNext();) {
+	   
+			String e = (String) it.next();
+			String v = graph.getEdgeSource(e);
+			System.out.println("new edge "+v+ " "+vertNew);
+			graph.addEdge(v, vertNew);
+		}
+		graph.removeVertex(vertOld);
+		return graph;
+	}
+    
+	private DirectedGraph <String, String> replaceTargetVertex (DirectedGraph<String, String> graph, String vertOld, String vertNew) {
+		Set inEdgV1  = graph.outgoingEdgesOf(vertOld);
+		for (Iterator it = inEdgV1.iterator(); it.hasNext();) {
+
+			String e = (String) it.next();
+			String v = graph.getEdgeTarget(e);
+			System.out.println("new edge "+vertNew+ " "+v);
+			System.out.println(graph.addEdge(vertNew, v));
+		}
+		graph.removeVertex(vertOld);
+		return graph;
+	}
+    
+    private String contactVertexes ( String v1, String v2) {
+        String newVert = "";
+        if (v1.length() > v2.length()) {
+           newVert = v1.concat(v2.substring(v2.length()));
+        }
+        else {
+            newVert = v1.substring(0,1).concat(v2.substring(0, v2.length()));
+        }
+        return newVert;
+    }
+    
+    private DirectedGraph<String, String>  simplify(DirectedGraph<String, String> graph) {
+        boolean wasNewVert = true;
+        while(wasNewVert){
+            wasNewVert = false;
+            Set<String> tmpVert =  graph.vertexSet();
+            String certArr [] = new String[tmpVert.size()];
+            int i = 0;
+            for (String tV : tmpVert) {
+                certArr[i++] = tV;
+            }
+            
+            for (String v1 : certArr) {
+                if(graph.containsVertex(v1)) {
+                    Set edgs = graph.outgoingEdgesOf(v1);
+                    if (edgs.size() == 1) {
+                        String e = (String) edgs.iterator().next();
+                        String v2 = graph.getEdgeTarget(e);
+                        Set edgs2 = graph.incomingEdgesOf(v2);
+
+                        if (edgs2.size() == 1) {
+                            
+                            String newVert = contactVertexes(v1, v2);
+                            System.out.println("Vert1 " + v1 + " Vert2 " +v2+ " to "+newVert);
+                            graph = replaceSourceVertex(graph, v1, newVert);
+                            graph = replaceTargetVertex(graph, v2, newVert);
+                            wasNewVert = true;
+                        }
+                    }
+                }
+            }
+        }
+        return graph;
+    }
+	
 }
