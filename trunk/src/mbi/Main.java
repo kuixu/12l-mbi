@@ -8,7 +8,8 @@ public class Main {
 	 * @param args
 	 */
 	public static void main(String[] args) {
-		String sequence = "SARKAFARKA";
+		String sequence = "ABRAKADABRA";
+		//String sequence = AssemblerDNA.generateSequence(20);
 		List<String> kmers = AssemblerDNA.perfectShotgun(sequence, 4);
 
 		System.out.println(kmers.toString());
