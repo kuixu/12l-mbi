@@ -4,10 +4,7 @@ import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Rectangle;
 import java.awt.geom.Rectangle2D;
-import java.util.Collections;
 import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.List;
 import java.util.Map;
 
 import javax.swing.JApplet;
