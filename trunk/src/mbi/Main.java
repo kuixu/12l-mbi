@@ -2,6 +2,7 @@ package mbi;
 
 import java.awt.BorderLayout;
 import java.util.Arrays;
+import java.util.LinkedList;
 import java.util.List;
 
 import javax.swing.JApplet;
@@ -39,7 +40,6 @@ public class Main {
 			System.exit(1);
 		}
 
-		boolean benchmark = false;
 		String path = null;
 		int randLength = -1;
 		String sequence = "ABRAKADABRA";
@@ -73,6 +73,7 @@ public class Main {
 		}
 
 		List<String> kmers = AssemblerDNA.perfectShotgun(sequence, k);
+		
 		DeBruijnGraph graph = AssemblerDNA.getDeBruijnGraph(kmers, true);
 		//graph = AssemblerDNA.simplify(graph);
 		
@@ -88,14 +89,15 @@ public class Main {
 		 mainFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		
 		System.out.println("K-MERS: "+kmers.toString());
-		String result = AssemblerDNA.attemptAssembly(kmers, trials, patience, true);
-		System.out.println("GENERATED "
-				+ (sequence.equals(result) ? "eqals" : "differs from")
-				+ " RESULT");
 		System.out.println("input:  "+sequence);
+		//String result = AssemblerDNA.attemptAssembly(kmers, trials, patience, true);
+		String result = AssemblerDNA.assemble2(kmers, true);
+		System.out.println("INPUT "
+				+ (sequence.equals(result) ? "equals" : "differs from")
+				+ " RESULT");
 		System.out.println("result: "+result);
 		if (result != null) {
-			System.out.println("GENERATED "
+			System.out.println("INPUT "
 					+ (sequence.indexOf(result, 0) > -1 ? "contains"
 							: "doesn't contain") + " RESULT");
 			System.out.println("RESULT "
@@ -106,7 +108,7 @@ public class Main {
 	}
 
 	public static void benchmark(int pat, int tri) {
-		for (int length = 15; length < 1000; length *= 1.2) {
+		for (int length = 15; length < 10000; length *= 1.2) {
 			for (int k = 3; k < 20; ++k) {
 				int successes = 0;
 				for (int test = 0; test < 100; ++test) {

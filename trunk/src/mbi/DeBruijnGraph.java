@@ -1,7 +1,9 @@
 package mbi;
 
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -33,6 +35,72 @@ public class DeBruijnGraph extends DirectedMultigraph<String, String> {
 		return vers;
 	}
 
+	
+	public synchronized List<String> findEulerPath(boolean verbose){
+		List<String> path = new LinkedList<String>();
+		DeBruijnGraph g = (DeBruijnGraph)this.clone();
+
+		while (g.vertexSet().size() != 0) {
+			String start = null, end = null;
+			int startIndex=-1;
+			if (path.size() == 0) {
+				Set<String> imbalanced = g.getImbalancedVertices();
+				if (imbalanced.size() != 2) {
+					if (verbose) {
+						System.err.println("Imbalanced graph. Aborting...");
+					}
+					return null;
+				}
+				for (String vert : imbalanced) {
+					if (g.inDegreeOf(vert) < g.outDegreeOf(vert)) {
+						start = vert;
+					} else if (g.inDegreeOf(vert) > g.outDegreeOf(vert)) {
+						end = vert;
+					}
+				}
+				assert (start != null && end != null && !start.equals(end));
+			}else{ //that is path is not null
+				for(String vert : g.vertexSet()){
+
+					startIndex = path.lastIndexOf(vert);
+					if(startIndex>=0){
+						path.remove(startIndex);
+						start=vert;
+						break;
+					}
+				}
+			}
+			while (start != null) {
+				if(startIndex==-1){
+					path.add(start);
+				}else{
+					path.add(startIndex++, start);
+				}
+				Set<String> directions = g.outgoingEdgesOf(start);
+				if (directions.size() > 0) {
+					String direction = directions.toArray(new String[directions
+							.size()])[0];
+					start = g.getEdgeTarget(direction);
+					g.removeEdge(direction);
+				} else {
+					start=null;
+				}
+			}
+			//remove stranded vertices - could have maintained a list of used vertices...
+			Set<String> vertsToRemove = new HashSet<String>();
+			for(String vert : g.vertexSet()){
+				if(g.inDegreeOf(vert)==0 && g.outDegreeOf(vert)==0){
+					vertsToRemove.add(vert);
+				}
+			}
+			for(String vert : vertsToRemove){
+				g.removeVertex(vert);
+			}
+		}
+		
+		return path;
+	}
+	
 	public String assemble(int patience, boolean verbose) {
 		Set<String> imbalancedVertices = getImbalancedVertices();
 		if (imbalancedVertices.size() != 2) {

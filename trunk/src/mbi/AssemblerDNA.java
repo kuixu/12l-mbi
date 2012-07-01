@@ -7,7 +7,6 @@ import java.io.InputStreamReader;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
@@ -152,6 +151,25 @@ public class AssemblerDNA {
 		}
 		return result;
 	}
+	
+	public static String assemble2(List<String> kmers, boolean verbose){
+		DeBruijnGraph graph = getDeBruijnGraph(kmers, true);
+		List<String> path = graph.findEulerPath(verbose);
+		if(path!=null){
+			return pathToGenome(path);
+		}else{
+			return null;
+		}
+	}
+	
+	public static String pathToGenome(List<String> path){
+		StringBuilder sb = new StringBuilder();
+		for(int i=0; i<path.size()-1; ++i){
+			sb.append(path.get(i).substring(0, 1));
+		}
+		sb.append(path.get(path.size()-1));
+		return sb.toString();
+	}
 
 	public static String readSequenceFromFile(String fileName) {
 		String subStr = "";
@@ -263,12 +281,12 @@ public class AssemblerDNA {
 			for (String v1 : certArr) {
 				// check if vertex is still in graph
 				if (graph.containsVertex(v1)) {
-					Set edgs = graph.outgoingEdgesOf(v1);
+					Set<String> edgs = graph.outgoingEdgesOf(v1);
 					if (edgs.size() == 1) { // check if vertex has only one
 											// outgoing edge
 						String e = (String) edgs.iterator().next();
 						String v2 = graph.getEdgeTarget(e);
-						Set edgs2 = graph.incomingEdgesOf(v2);
+						Set<String> edgs2 = graph.incomingEdgesOf(v2);
 
 						if (edgs2.size() == 1) { // check if vertes on the end
 													// of that edge, has only
