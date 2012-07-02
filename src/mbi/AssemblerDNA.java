@@ -80,7 +80,6 @@ public class AssemblerDNA {
 				continue;
 			} else {
 				for (int s = 0, e = k; e <= read.length(); ++s, ++e) {
-					// System.out.println(read.substring(s, e));
 					kmers.add(read.substring(s, e));
 				}
 			}
@@ -97,7 +96,7 @@ public class AssemblerDNA {
 	 * @param k
 	 * @return
 	 */
-	public static List<String> perfectShotgun(String dna, int k) {
+	public static List<String> idealShotgun(String dna, int k) {
 		List<String> results = new LinkedList<String>();
 		for (int i = 0; i <= dna.length() - k; ++i) {
 			results.add(dna.substring(i, i + k));
@@ -109,7 +108,7 @@ public class AssemblerDNA {
 	/**
 	 * 
 	 * @param str
-	 *            Set of reads to print
+	 *            Collection of reads to print
 	 */
 	public static void printAll(Collection<String> str) {
 		for (String k : str) {
@@ -140,34 +139,23 @@ public class AssemblerDNA {
 
 	}
 
-	public static String attemptAssembly(List<String> kmers, int attempts,
-			int attemptPatience, boolean verbose) {
-		String result = null;
-		while (attempts-- > 0 && result == null) {
-			Collections.shuffle(kmers);
-			DeBruijnGraph graph = getDeBruijnGraph(kmers, true);
-			//graph=simplify(graph);
-			result = graph.assemble(attemptPatience, verbose);
-		}
-		return result;
-	}
-	
-	public static String assemble2(List<String> kmers, boolean verbose){
+	public static String assemble(List<String> kmers, boolean verbose)
+			throws MbiException {
 		DeBruijnGraph graph = getDeBruijnGraph(kmers, true);
 		List<String> path = graph.findEulerPath(verbose);
-		if(path!=null){
+		if (path != null && path.size() > 0) {
 			return pathToGenome(path);
-		}else{
-			return null;
+		} else {
+			throw new MbiException("Returned empty or null Euler path!");
 		}
 	}
-	
-	public static String pathToGenome(List<String> path){
+
+	public static String pathToGenome(List<String> path) {
 		StringBuilder sb = new StringBuilder();
-		for(int i=0; i<path.size()-1; ++i){
+		for (int i = 0; i < path.size() - 1; ++i) {
 			sb.append(path.get(i).substring(0, 1));
 		}
-		sb.append(path.get(path.size()-1));
+		sb.append(path.get(path.size() - 1));
 		return sb.toString();
 	}
 
@@ -307,15 +295,6 @@ public class AssemblerDNA {
 			}
 		}
 
-//		Set<String> verts = graph.vertexSet();
-//		for (String vert : verts.toArray(new String[verts.size()])) {
-//			if (graph.outDegreeOf(vert) == 0 && graph.inDegreeOf(vert) == 0
-//					&& graph.edgeSet().size() > 0) {
-//				graph.removeVertex(vert);
-//			}
-//		}
-		// System.out.println(graph.vertexSet().toString());
-		// System.out.println(graph.edgeSet().toString());
 		return graph;
 	}
 }
