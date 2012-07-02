@@ -1,0 +1,106 @@
+\documentclass{article}
+\usepackage{polski}
+\usepackage[utf8]{inputenc}
+\usepackage{listings}
+\usepackage[usenames,dvipsnames]{color} % For colors and names
+\usepackage{amsmath}
+\usepackage{graphicx}
+\usepackage{tabularx}
+\usepackage{mathtools}
+\title{Metody Bioinformatyki \\ Projekt: prosty assembler DNA } % Title
+
+
+\textwidth = 400pt
+\oddsidemargin = 30pt
+\hyphenpenalty = 1000
+
+\author{Tomasz \textsc{Bawej} \\ Bartosz \textsc{Chodnicki}} % Author name
+
+\definecolor{mygrey}{gray}{.96} % Light Grey
+\lstset{language=Verilog, tabsize=3, backgroundcolor=\color{mygrey}, basicstyle=\small \ttfamily, commentstyle=\color{BrickRed}}
+\lstset{ 
+	language=[ISO]C++,              % choose the language of the code ("language=Verilog" is popular as well)
+   tabsize=3,							  % sets the size of the tabs in spaces (1 Tab is replaced with 3 spaces)
+	basicstyle=\scriptsize,               % the size of the fonts that are used for the code
+	numbers=left,                   % where to put the line-numbers
+	numberstyle=\scriptsize,              % the size of the fonts that are used for the line-numbers
+	stepnumber=2,                   % the step between two line-numbers. If it's 1 each line will be numbered
+	numbersep=5pt,                  % how far the line-numbers are from the code
+	backgroundcolor=\color{mygrey}, % choose the background color. You must add \usepackage{color}
+	%showspaces=false,              % show spaces adding particular underscores
+	%showstringspaces=false,        % underline spaces within strings
+	%showtabs=false,                % show tabs within strings adding particular underscores
+	frame=single,	                 % adds a frame around the code
+	tabsize=3,	                    % sets default tabsize to 2 spaces
+	captionpos=b,                   % sets the caption-position to bottom
+	breaklines=true,                % sets automatic line breaking
+	breakatwhitespace=false,        % sets if automatic breaks should only happen at whitespace
+	%escapeinside={\%*}{*)},        % if you want to add a comment within your code
+	commentstyle=\color{BrickRed},   % sets the comment style
+	columns=fixed
+}
+
+\begin{document}
+
+\maketitle % Insert the title, author and date
+
+\setlength\parindent{0pt} % Removes all indentation from paragraphs
+
+\renewcommand{\labelenumi}{\alph{enumi}.} % Make numbering in the enumerate environment by letter rather than number (e.g. section 6)
+
+\section{Treść zadania}
+Celem zadania było zrealizowanie prostej implementacji assemblera DNA wykorzystującego graf De Bruijn'a.
+
+\section{Realizacja zadania}
+\subsection{Istotne założenia i ograniczenia}
+Program dopuszcza występowanie w grafie wynikowym powtarzających się krawędzi oraz pętli (także w postaci krawędzi wychodzących i wchodzących do tego samego węzła). Nie zostało natomiast zaimplementowane wykrywanie powtórzonych odczytów, które w rzeczywistych warunkach łatwo prowadziłyby do wygenerowania powtarzających się \textit{k-merów}. Zamiast tego, algorytm za punkt wyjścia obiera posortowany losowo zbiór \textit{k-merów} reprezentujących unikalne fragmenty łańcucha źródłowego.
+\subsection{Zrealizowana funkcjonalność, instrukcja obsługi programu}
+Program ma charakter symulacyjny, w związku z czym był tworzony z naciskiem na możliwość weryfikacji generowanych wyników kosztem np. możliwości dostarczania rozwiązań dla problemów o nieznanej odpowiedzi. Program umożliwia zatem wczytanie lub generację łańcucha, który następnie jest rozbijany na zbiór (losowo przemieszanych) \textit{k-merów}, z których dalej jest tworzony graf, by ostatecznie postarać się wrócić do wejściowego łańcucha. Łańcuchy te są ze sobą na koniec porównywane. Ponadto, wizualizowany jest wynikowy graf de Bruijn'a.
+\begin{figure}[h!]
+\caption{Graf wygenerowany dla łańcucha GGATACTTTCAACGATTGAGCACAGTTG}
+\includegraphics[width=\linewidth]{screen.png} 
+\end{figure}
+
+
+Program dostarczony jest jako plik \textit{jar}, uruchamialny poleceniem \texttt{java -jar mbi.jar}
+\subsubsection{Tryb \textit{benchmark}}
+Polecenie \texttt{java -jar mbi.jar benchmark} wywołuje procedurę, która w kolejnych iteracjach generuje coraz dłuższe łańcuchy, a w kolejnych poditeracjach coraz dłuższe \textit{k-mery} oraz raportuje skuteczność "odbudowywania" łańcucha wejściowego z \textit{k-merów}.
+\subsubsection{Tryb pracy z plikiem}
+\texttt{java -jar mbi.jar -f ścieżka\_do\_pliku} umożliwia pracę z łańcuchem zapisanym w pliku \texttt{ścieżka\_do\_pliku}. Dodatkowe parametry tego trybu umożliwiają określenie:
+\begin{itemize}
+\item długości \textit{k-merów}: parametr \texttt{-k}
+\end{itemize}
+\subsubsection{Tryb pracy z generowanymi łańcuchami}
+Polecenie \texttt{java -jar mbi.jar -r 97} uruchamia algorytm dla losowo wygenerowanego łańcucha o długości 97 znaków. Parametr \texttt{k} ma tutaj takie samo zastosowanie, jak w~przypadku powyżej.
+\subsection{Niezrealizowana funkcjonalność}
+Ze względu na pośpiech wynikający z opóźnień w realizacji projektu, funkcja upraszczania grafu nie została ostatecznie zintegrowana z resztą rozwiązania, chociaż jej kod pozostawiono w źródłach "na wszelki wypadek".
+Upraszczanie grafu miało polegać na~łączeniu par wierzchołków, które i~tak byłyby potem odwiedzone w~procesie poszukiwania ścieżki Eulera.
+Nie~udało się także zaimplementować sposobu składania sekwencji ze~zbioru odczytów o~losowym charakterze nałożeń (\textit{overlaps}), takiego jak chociażby algorytmy \textit{bus tour} czy \textit{rock band}. W~związku z~tym implementacja wykorzystuje idealne (ekstremalnie optymistyczne) dzielenie odczytów na~\textit{k-mery}.
+
+\section{Opis implementacji}
+Program napisano w całości w języku Java, wykorzystując przy tym biblioteki \textit{JGrapht} (reprezentacja grafów) oraz \textit{JGraph} (wizualizacja grafów)
+\subsection{Zaimplementowane klasy}
+\begin{itemize}
+\item \texttt{DeBruijnGraph} - klasa reprezentująca graf De Bruijn'a, pochodna po klasie \\ \texttt{DirectedMultigraph} z pakietu \texttt{org.jgraph}, umożliwiającej podstawowe manipulacje na grafie. Najistotniejsze funkcje:
+\begin{itemize}
+\item \texttt{findEulerPath} - zwraca ścieżkę Eulera dla grafu w postaci listy etykiet kolejno odwiedzanych węzłów
+\end{itemize}
+\item \texttt{DeBruijnEdgeFactory} – klasa implementująca interfejs EdgeFactory, wymagany~dla tworzenia krawędzi grafu z etykietami typu \texttt{String}.
+\item \texttt{AssemblerDNA} – klasa zbierająca i udostępniająca metody użyteczne w procesie budowy grafu, generacji i podziałów łańcuchów itp. Najistotniejsze z nich to:
+\begin{itemize}
+\item \texttt{generateSequence} - generuje sekwencję DNA
+\item \texttt{readSequenceFromFile} - wczytuje sekwencję z pliku
+\item \texttt{shotgun, safeShotgun, idealShotgun} - generuje zestaw losowo przemieszanych \textit{k-merów}. Kolejno wymienione implementacje różnią się malejącym (do zera) poziomem losowości nakładania się odczytów.
+\item \texttt{getDeBruijnGraph} - tworzy graf de Bruijna na podstawie zestawu \textit{k-merów}
+\item \texttt{assemble} - przeprowadza procedurę rekonstrukcji genomu na podstawie grafu
+\item \texttt{pathToGenome} - konwertuje listę etykiet kolejno odwiedzanych wierzchołków~do postaci łańcucha DNA
+\end{itemize}
+\item \texttt{GrApphlet} - klasa służąca do wizualizacji grafu
+\item \texttt{MbiException} - \textit{wrapper} dla standardowego \texttt{Exception}
+\item \texttt{Main} - główna klasa aplikacji, zawierająca metody \texttt{main} oraz \texttt{benchmark}
+\end{itemize}
+\subsection{Wyniki, wnioski}
+Zaimplementowany algorytm testowano dla łańcuchów DNA o długości do 10000 elementów, dla~których to przy wartości $k > 13$ radził on sobie bez zarzutów (dla krótszych łańcuchów niższa wartość k~też dawała dobre wyniki). Przy ocenie zaimplementowanego rozwiązania trzeba jednak pamiętać o naiwnym sposobie gromadzenia odczytów, co niestety czyni program bardziej ilustracją idei niż narzędziem o wymiernym potencjale praktycznym.
+Niemniej jednak stanowić on może punkt wyjściowy dla implementacji bardziej wydajnego (język C lub C++) oraz bardziej praktycznego programu, działającego w warunkach bardziej zbliżonych do rzeczywistych.
+
+\end{document}
