@@ -17,6 +17,7 @@ import org.jgrapht.ext.JGraphModelAdapter;
 
 public class GrApphlet extends JApplet {
 
+	private static final long serialVersionUID = 1L;
 	private static final Color DEFAULT_BG_COLOR = Color.decode("#FAFBFF");
 	private static final Dimension DEFAULT_SIZE = new Dimension(1200, 900);
 

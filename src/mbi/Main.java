@@ -2,7 +2,6 @@ package mbi;
 
 import java.awt.BorderLayout;
 import java.util.Arrays;
-import java.util.LinkedList;
 import java.util.List;
 
 import javax.swing.JApplet;
